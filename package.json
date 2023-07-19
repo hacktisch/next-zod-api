@@ -1,6 +1,6 @@
 {
   "name": "next-zod-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simplify Next.js App Router endpoints, with Zod schema validation",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
