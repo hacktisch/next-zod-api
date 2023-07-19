@@ -8,7 +8,7 @@ type NextZodApiOptions = {
   responseSchema?: z.ZodType<any, any>
 }
 
-type NextZodApiHandler = (data: { query: any, body: any, formData: any }) => Promise<{ status: number, body: any }>;
+type NextZodApiHandler = (data: { query: any, body: any, formData: any }) => Promise<{ status: number, body: any, headers: any }>;
 
 function formDataToObject(formData: any): { [key: string]: any } {
   let object: { [key: string]: any } = {};
@@ -56,7 +56,7 @@ export function endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
     }
 
     try {
-      const { status, body } = await handler({
+      const { status, body, headers: setHeaders } = await handler({
         query: queryResult.data,
         body: bodyResult.data,
         formData: formDataResult.data,
@@ -67,7 +67,12 @@ export function endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
         return NextResponse.json({ error: 'Invalid response data' }, { status: 500 });
       }
 
-      return NextResponse.json(responseBodyResult.data, { status });
+      let headers;
+      if (setHeaders) {
+        headers = new Headers(setHeaders)
+      }
+
+      return NextResponse.json(responseBodyResult.data, { status, headers });
     } catch (err) {
       console.error(err);
       return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

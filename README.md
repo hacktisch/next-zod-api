@@ -59,7 +59,7 @@ export const GET = endpoint({
   - `bodySchema?`: A zod schema to validate the body parameters. If omitted, no validation will occur.
   - `formDataSchema?`: A zod schema to validate the form data. If omitted, no validation will occur.
   - `responseSchema?`: A zod schema to validate the response. If omitted, no validation will occur.
-- `handler`: A function to handle the request which receives the input data as `{query, body, formData}` (parsed into objects). The function should return an object with a `status` code and a `body` object that will be returned as json.
+- `handler`: A function to handle the request which receives the input data as `{query, body, formData}` (parsed into objects). The function should return an object with a `status` code and a `body` object that will be returned as json. Optionally, you can return a `headers` object (e.g. `{'X-Hello-From-Api-Route':'hello'}`).
 
 ## License
 
