@@ -1,0 +1,34 @@
+{
+  "name": "next-zod-api",
+  "version": "0.0.1",
+  "description": "Simplify Next.js App Router endpoints, with Zod schema validation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": "github:hacktisch/next-zod-api",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "nextjs",
+    "next",
+    "app router",
+    "api",
+    "endpoint",
+    "zod",
+    "builder",
+    "handler",
+    "middleware"
+  ],
+  "author": "Merijn van Wouden",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.21.4"
+  },
+  "peerDependencies": {
+    "next": ">=13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "typescript": "^5.1.6"
+  }
+}
