@@ -25,8 +25,16 @@ function formDataToObject(formData: any): { [key: string]: any } {
   return object;
 }
 
-export function endpoint(options: NextZodApiOptions, handler: NextZodApiHandler) {
-  const { querySchema, bodySchema, responseSchema, formDataSchema } = options;
+
+export function endpoint(options: NextZodApiOptions | NextZodApiHandler, handler?: NextZodApiHandler) {
+  let opts: NextZodApiOptions;
+  if (typeof options === 'function') {
+    handler = options;
+    opts = {};
+  } else {
+    opts = options;
+  }
+  const { querySchema, bodySchema, responseSchema, formDataSchema } = opts;
 
   const any = z.any();
   const defaultResult = { success: true, data: {} }
@@ -58,7 +66,7 @@ export function endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
     try {
 
       const requestHeaders = Object.fromEntries(req.headers);
-      const { status, body, headers: setHeaders } = await handler({
+      const { status, body, headers: setHeaders } = await (handler as NextZodApiHandler)({
         params,
         query: queryResult.data,
         body: bodyResult.data,

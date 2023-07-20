@@ -30,7 +30,7 @@ import { endpoint, z } from 'next-zod-api';
 
 export const (GET|POST|PUT|PATCH|DELETE) = endpoint({
     /* 
-      These are all optional validators using Zod
+      (optional) These are all optional validators using Zod
     */
     querySchema: z(...),
     bodySchema: z(...),
@@ -157,7 +157,7 @@ export const POST = endpoint({
 
 ### endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
 
-- `options`: An object that contains the zod schemas for validation.
+- `options` (**optional**): An object that contains the zod schemas for validation.
   - `querySchema?`: A zod schema to validate the query parameters. If omitted, no validation will occur.
   - `bodySchema?`: A zod schema to validate the body parameters. If omitted, no validation will occur.
   - `formDataSchema?`: A zod schema to validate the form data. If omitted, no validation will occur.
