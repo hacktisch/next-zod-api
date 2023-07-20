@@ -8,7 +8,7 @@ type NextZodApiOptions = {
   responseSchema?: z.ZodType<any, any>
 }
 
-type NextZodApiHandler = (data: { query: any, body: any, formData: any }) => Promise<{ status: number, body: any, headers: any }>;
+type NextZodApiHandler = (data: { params: any, query: any, body: any, formData: any, headers: any }) => Promise<{ status: number, body: any, headers: any }>;
 
 function formDataToObject(formData: any): { [key: string]: any } {
   let object: { [key: string]: any } = {};
@@ -29,9 +29,9 @@ export function endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
   const { querySchema, bodySchema, responseSchema, formDataSchema } = options;
 
   const any = z.any();
-  const defaultResult = { success: true, data: null }
+  const defaultResult = { success: true, data: {} }
 
-  return async (req: NextRequest) => {
+  return async (req: NextRequest, { params }: any = { params: {} }) => {
     const { searchParams } = new URL(req.url);
 
     const queryResult = (querySchema || any).safeParse(Object.fromEntries(searchParams));
@@ -56,10 +56,14 @@ export function endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
     }
 
     try {
+
+      const requestHeaders = Object.fromEntries(req.headers);
       const { status, body, headers: setHeaders } = await handler({
+        params,
         query: queryResult.data,
         body: bodyResult.data,
         formData: formDataResult.data,
+        headers: requestHeaders
       });
       const responseBodyResult = (responseSchema || any).safeParse(body);
 
