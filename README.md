@@ -186,11 +186,11 @@ And add the CORS headers to your responses:
 ```js
 export const POST = endpoint({
 //...
-},async ()=>{
-  return {
-    body: ...,
-    headers: corsHeaders
-  }
+}, async ()=>{
+    return {
+        body: ...,
+        headers: corsHeaders
+    }
 });
 ```
 
@@ -198,8 +198,8 @@ The `cors` function accepts an optional configuration object where you can speci
 
 ```js
 const { preflight, corsHeaders } = cors({
-  origin: "https://example.com",
-  allowHeaders: "Content-Type, Authorization, X-Requested-With"
+    origin: "https://example.com",
+    allowHeaders: "Content-Type, Authorization, X-Requested-With"
 });
 ```
 
