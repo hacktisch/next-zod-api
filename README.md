@@ -3,11 +3,19 @@
 ![npm](https://img.shields.io/npm/v/next-zod-api)
 ![license](https://img.shields.io/npm/l/next-zod-api)
 
-A [NextJS](https://nextjs.org/) API handler for the [**App Router**](https://nextjs.org/docs/app) that validates request and response using [Zod](https://github.com/colinhacks/zod).
+> :warning: This package is for the *newer* [**App Router**](https://nextjs.org/docs/app) which is introduced in Next.JS 13. If you are using the *older* [Pages Router](https://nextjs.org/docs/pages), use [next-better-api](https://github.com/filp/next-better-api) instead.
 
-Simplify the creation of API endpoints in NextJS with a method `endpoint` that handles validation of query parameters, body parameters, form data, and the response.
+A [Next.JS](https://nextjs.org/) API handler that validates request and response using [Zod](https://github.com/colinhacks/zod).
+
+Simplify the creation of API endpoints in Next.JS with a method `endpoint` that handles validation of query parameters, body payload (json, form data, etc), and the response.
 
 This package was intended as an App Router compatible rewrite of [next-better-api](https://github.com/filp/next-better-api/) so I kept the `endpoint` function work the same way.
+
+#### Jump to example code:
+* [GET Example](#get-example)
+* [PUT Example with request body](#put-example-with-request-body)
+* [POST Example with form data](#post-example-with-form-data)
+* [CORS Helper](#cors-helper)
 
 ## Installation
 
@@ -34,14 +42,12 @@ export const (GET|POST|PUT|PATCH|DELETE) = endpoint({
     */
     querySchema: z(...),
     bodySchema: z(...),
-    formDataSchema: z(...),
     responseSchema: z(...)
-}, async ({ params, query, body, formData, headers }) => {
+}, async ({ params, query, body, headers }) => {
     /*
       params: Route parameters such as [slug] in /path/[slug]/route.js
       query: GET parameters: ?key=value&key2=value2
-      body: POST request data parsed JSON body
-      formData: POST request data in html form format (multipart)
+      body: POST request data parsed (json / multipart/form-data / text)
       headers: Request headers parsed into an object {key: value}
     */
     return {
@@ -128,18 +134,28 @@ export const PUT = endpoint({
 #### **`/app/api/user/[user_id]/avatar/route.js`**
 ```js
 import { endpoint, z } from 'next-zod-api';
+import fs from 'fs';
 
 export const POST = endpoint({
-    formDataSchema: z.object({
+    bodySchema: z.object({
+        file: z.any().refine(value => {
+            return value.constructor.name === 'File';
+        }, {
+            message: 'Must be a file',
+        }),
+        /* Or alternatively, if the browser 'File' object is available in your environment: */
         file: z.instanceof(File)
     }),
     responseSchema: z.object({
         success: z.boolean(),
         fileName: z.string()
     })
-}, async ({ params, formData }) => {
-    const { file } = formData;
-    const fileName = await saveAvatar(params.user_id, file);
+}, async ({ params, body }) => {
+    const { file } = body;
+    const fileName = file.name;
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    fs.writeFileSync('./uploads/'+fileName, buffer)
 
     return {
         status: 200,
@@ -151,20 +167,49 @@ export const POST = endpoint({
 });
 ```
 
+### CORS Helper
 
+The package includes a helper function to handle Cross-Origin Resource Sharing (CORS) in your API endpoints. CORS is a mechanism that allows resources on a web page to be requested from another domain outside the domain from which the resource originated.
 
-## API
+Import the `cors` function from the package and use it to create CORS headers and a preflight response for your API endpoints.
 
-### endpoint(options: NextZodApiOptions, handler: NextZodApiHandler)
+Here's how to use it:
 
-- `options` (**optional**): An object that contains the zod schemas for validation.
-  - `querySchema?`: A zod schema to validate the query parameters. If omitted, no validation will occur.
-  - `bodySchema?`: A zod schema to validate the body parameters. If omitted, no validation will occur.
-  - `formDataSchema?`: A zod schema to validate the form data. If omitted, no validation will occur.
-  - `responseSchema?`: A zod schema to validate the response. If omitted, no validation will occur.
-- `handler`: A function to handle the request which receives the input data as `{query, body, formData, params, headers}` (parsed into objects). The function should return an object with a `status` code and a `body` object that will be returned as json. Optionally, you can return a response `headers` object (e.g. `{'X-Hello-From-Api-Route':'hello'}`).
+```js
+import { endpoint, cors, z } from 'next-zod-api';
+const { preflight, corsHeaders } = cors();
+export const OPTIONS = preflight;
+```
 
+And add the CORS headers to your responses:
 
+```js
+export const POST = endpoint({
+//...
+},async ()=>{
+  return {
+    body: ...,
+    headers: corsHeaders
+  }
+});
+```
+
+The `cors` function accepts an optional configuration object where you can specify the `origin` and `allowHeaders`:
+
+```js
+const { preflight, corsHeaders } = cors({
+  origin: "https://example.com",
+  allowHeaders: "Content-Type, Authorization, X-Requested-With"
+});
+```
+
+- `origin` (optional): Configures the `Access-Control-Allow-Origin` CORS header. Defaults to `"*"`, which allows any origin.
+- `allowHeaders` (optional): Configures the `Access-Control-Allow-Headers` CORS header. Defaults to `"Content-Type, Authorization, X-Requested-With"`, which allows these headers to be used in the actual request.
+
+The `cors` function returns an object with two properties:
+
+- `corsHeaders`: An object with CORS headers that can be included in a response.
+- `preflight`: A function that returns a preflight response, which is a simple response with a 200 status and the CORS headers. You can use this for handling OPTIONS requests, which are sent by browsers as part of the CORS preflight process. 
 
 ## License
 

@@ -1,4 +1,4 @@
-import { endpoint } from './NextZodApi';
+import { endpoint, cors } from './NextZodApi';
 import { z } from 'zod';
 
-export { endpoint, z };
+export { endpoint, cors, z };
