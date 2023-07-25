@@ -51,29 +51,31 @@ export function endpoint(
     );
 
     let body = null;
-    if (contentType.includes("application/json")) {
-      try {
-        body = await req.json();
-      } catch (e) {
-        return NextResponse.json(
-          { error: "Invalid JSON body" },
-          { status: 400 }
-        );
+    if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      if (contentType.includes("application/json")) {
+        try {
+          body = await req.json();
+        } catch (e) {
+          return NextResponse.json(
+            { error: "Invalid JSON body" },
+            { status: 400 }
+          );
+        }
+      } else if (contentType.includes("multipart/form-data")) {
+        try {
+          const form = await req.formData();
+          body = formDataToObject(form);
+        } catch (e) {
+          return NextResponse.json(
+            { error: "No form data found" },
+            { status: 400 }
+          );
+        }
+      } else {
+        try {
+          body = await req.text();
+        } catch (e) { }
       }
-    } else if (contentType.includes("multipart/form-data")) {
-      try {
-        const form = await req.formData();
-        body = formDataToObject(form);
-      } catch (e) {
-        return NextResponse.json(
-          { error: "No form data found" },
-          { status: 400 }
-        );
-      }
-    } else {
-      try {
-        body = await req.text();
-      } catch (e) { }
     }
 
     const bodyResult =

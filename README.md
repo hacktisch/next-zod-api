@@ -3,7 +3,7 @@
 ![npm](https://img.shields.io/npm/v/next-zod-api)
 ![license](https://img.shields.io/npm/l/next-zod-api)
 
-> :warning: This package is for the *newer* [**App Router**](https://nextjs.org/docs/app) which is introduced in Next.JS 13. If you are using the *older* [Pages Router](https://nextjs.org/docs/pages), use [next-better-api](https://github.com/filp/next-better-api) instead.
+> :warning: This package is for the *newer* **[App Router](https://nextjs.org/docs/app)** which is introduced in Next.JS 13. If you are using the *older* [Pages Router](https://nextjs.org/docs/pages), use [next-better-api](https://github.com/filp/next-better-api) instead.
 
 A [Next.JS](https://nextjs.org/) API handler that validates request and response using [Zod](https://github.com/colinhacks/zod).
 
